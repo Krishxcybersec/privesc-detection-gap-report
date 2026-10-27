@@ -1,0 +1,30 @@
+title: Access to Unattended-Setup File Containing Credentials
+id: 7a1b9f10-0c2e-4e8e-9a1a-1a2b3c4d5e0a
+status: experimental
+description: >
+    Detects an access attempt on a Windows unattended-setup answer file. These files can
+    hold an administrator password and are a known credential source. This rule relies on
+    file-system auditing (a SACL / Event ID 4663) being enabled on the relevant paths; if
+    auditing is off, use the process-based companion rule instead.
+references:
+    - https://attack.mitre.org/techniques/T1552/001/
+author: Krishxcybersec
+date: 2026-10-27
+tags:
+    - attack.credential-access
+    - attack.t1552.001
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4663
+        ObjectName|endswith:
+            - '\Panther\Unattend.xml'
+            - '\Panther\Autounattend.xml'
+            - '\Sysprep\Unattend.xml'
+    condition: selection
+falsepositives:
+    - Legitimate setup or maintenance tooling accessing the file. Review the subject
+      account; a standard user is not expected to read these.
+level: high
