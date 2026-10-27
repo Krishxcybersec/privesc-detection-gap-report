@@ -21,7 +21,7 @@ is a tool or instructions for attacking systems that are not mine.
 |---|---|
 | Microsoft Defender (built in) | A typical out-of-the-box Windows machine |
 | Sysmon + community config | A team that has added extra logging |
-| My own detectors (MSc dissertation, [1.0](../cybersecurity-portfolio/04-privesc-detection/)) | Purpose-built detection for these techniques |
+| My own detectors (MSc dissertation, **1.0** — separate repo) | Purpose-built detection for these techniques |
 
 *(Wazuh SIEM may be added in a later version.)*
 
@@ -31,8 +31,8 @@ is a tool or instructions for attacking systems that are not mine.
 |---|-----------|--------------|
 | 1 | AlwaysInstallElevated policy | T1548.002 |
 | 2 | Unquoted service path | T1574.009 |
-| 3 | Backup-operator privilege abuse | T1003 / T1078 |
-| 4 | Saved-credential reuse (cmdkey / runas) | T1078 / T1555 |
+| 3 | Backup-operator privilege abuse | T1003.002 |
+| 4 | Saved-credential reuse (cmdkey / runas) | T1078 / T1555.004 |
 | 5 | Credentials in an unattended-setup file | T1552.001 |
 
 ## Coverage matrix
@@ -49,11 +49,13 @@ is a tool or instructions for attacking systems that are not mine.
 
 ## Repository layout
 
-- `lab-setup.md` — how the isolated test VM was built (added in session 2)
-- `results/` — per-technique findings and the filled matrix
-- `sigma-rules/` — detection rules written to close the gaps found
-- `screenshots/` — evidence captured from the lab
+- [`results/`](results/) — per-technique detection write-ups and the coverage matrix
+- [`sigma-rules/`](sigma-rules/) — the detection rules, in Sigma format, with MITRE tags
+- [`TESTING-PLAN.md`](TESTING-PLAN.md) — how each technique is tested and recorded
+- `screenshots/` — evidence captured from the lab (added during testing)
+- `lab-setup.md` — how the isolated test VM was built (added during testing)
 
 ## Status
 
+Detection write-ups and Sigma rules are complete; lab testing is in progress.
 See [`LAB-PROGRESS.md`](LAB-PROGRESS.md) for the current step.
