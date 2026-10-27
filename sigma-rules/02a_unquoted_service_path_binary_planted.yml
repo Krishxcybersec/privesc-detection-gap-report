@@ -1,0 +1,33 @@
+title: Executable Planted at an Unquoted Service Path Location
+id: 7a1b9f10-0c2e-4e8e-9a1a-1a2b3c4d5e03
+status: experimental
+description: >
+    Detects a new executable written to a filesystem location that Windows would
+    launch for a service with an unquoted ImagePath containing spaces (for example
+    C:\Program.exe). Legitimate software does not place executables at these names,
+    so this is a strong indicator that an unquoted service path is being hijacked.
+references:
+    - https://attack.mitre.org/techniques/T1574/009/
+author: Krishxcybersec
+date: 2026-10-27
+tags:
+    - attack.privilege-escalation
+    - attack.persistence
+    - attack.t1574.009
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection:
+        TargetFilename|endswith: '.exe'
+        TargetFilename|re: '^[A-Za-z]:\\[^\\]+\.exe$'
+    filter_known:
+        TargetFilename|startswith:
+            - 'C:\Windows\'
+            - 'C:\Program Files\'
+            - 'C:\Program Files (x86)\'
+    condition: selection and not filter_known
+falsepositives:
+    - Rare installers or portable tools that write an executable to a drive root.
+      Review which process wrote the file and whether a service path matches it.
+level: high

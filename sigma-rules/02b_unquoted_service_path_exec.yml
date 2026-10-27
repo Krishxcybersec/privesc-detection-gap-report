@@ -1,0 +1,32 @@
+title: Service Binary Executed from an Unexpected Path
+id: 7a1b9f10-0c2e-4e8e-9a1a-1a2b3c4d5e04
+status: experimental
+description: >
+    Detects a process launched by the Windows service controller (services.exe) from
+    an unusual location such as a drive root. When a service has an unquoted ImagePath,
+    Windows can run an executable placed earlier in the path (e.g. C:\Program.exe) as
+    the service account, which is typically SYSTEM. A service child running from a
+    non-standard directory is a sign of this hijack.
+references:
+    - https://attack.mitre.org/techniques/T1574/009/
+author: Krishxcybersec
+date: 2026-10-27
+tags:
+    - attack.privilege-escalation
+    - attack.t1574.009
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        ParentImage|endswith: '\services.exe'
+    filter_normal:
+        Image|startswith:
+            - 'C:\Windows\'
+            - 'C:\Program Files\'
+            - 'C:\Program Files (x86)\'
+    condition: selection and not filter_normal
+falsepositives:
+    - Third-party services legitimately installed outside Program Files. Baseline the
+      normal service images on the host and treat new or unexpected paths as suspicious.
+level: high
