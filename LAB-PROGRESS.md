@@ -62,10 +62,13 @@
 - [ ] Take snapshot **"lab-ready"**
 
 ### Session 3 — logging tools
-- [ ] Confirm Microsoft Defender is on
-- [ ] Install Sysmon with a community config
-- [ ] Turn on process-creation command-line auditing
-- [ ] Take snapshot **"logging-ready"**
+- [x] Confirm Microsoft Defender is on (real-time protection True, signatures 27/10/2026)
+- [x] Install Sysmon with a community config (Sysmon v15.22, SwiftOnSecurity `sysmonconfig-export.xml`, in `C:\Tools` in the VM)
+- [x] Turn on process-creation command-line auditing, plus Logon, Special Logon, Sensitive Privilege Use, File System, User Account Management, Security Group Management (auditpol)
+- [x] Create the standard test user `labuser` (not in Administrators)
+- [x] Logging verified: 4688 records full command lines; Sysmon writing events
+- [x] Rename the VM to `WIN-LAB` (was `DESKTOP-9RAM3EQ`) so screenshots match the docs — confirm with `hostname` at the start of testing
+- [x] Take snapshot **"lab-ready"** (2026-10-27, VM running; snapshots now: clean, updated, lab-ready). Roll back to this before every technique.
 
 ### Per-technique sessions (x5) — one at a time
 - [ ] Technique 1: run in lab, record what each defence showed, screenshot, fill matrix row
@@ -93,3 +96,4 @@
 - 2026-10-27 — overnight install on the USB HDD was far too slow; rebuilt the VM on C: (internal NVMe SSD). Next: fresh install on the new VM.
 - 2026-10-27 — lab base finished: Windows 11 Pro + VMware Tools + updates + password, snapshot "clean" taken. Next: build the 5 test conditions by hand (session 2), while the detection write-ups get drafted in parallel.
 - 2026-10-27 — all 5 detection packs written and committed (write-ups + 10 Sigma rules + matrix). Written half of the project is done. Next: lab testing to fill the matrix and capture screenshots.
+- 2026-10-27 — logging on (auditpol + Sysmon 15.22 + Defender), standard user `labuser` created, VM renamed, snapshot `lab-ready` taken. Lab is ready. Next: technique 1 test, with the user driving (predict → find evidence → decide → write finding → explain back).
