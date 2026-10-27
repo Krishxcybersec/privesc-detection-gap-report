@@ -1,0 +1,23 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+.vscode/
+.idea/
+
+# No raw VM files or disk images in the repo
+*.vdi
+*.vmdk
+*.vhd
+*.vhdx
+*.ova
+*.iso
+
+# No raw event-log exports (may contain host details)
+*.evtx
+
+# Keep documents out
+*.docx
+*.doc
+*.pdf
