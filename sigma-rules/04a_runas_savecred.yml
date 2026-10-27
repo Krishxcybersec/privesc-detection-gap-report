@@ -1,0 +1,30 @@
+title: Runas Using Saved Credentials (/savecred)
+id: 7a1b9f10-0c2e-4e8e-9a1a-1a2b3c4d5e07
+status: experimental
+description: >
+    Detects runas.exe launched with the /savecred option, which runs a program using a
+    credential previously stored in Windows Credential Manager without prompting for the
+    password. A standard user using /savecred to run as a privileged account is a common
+    privilege-escalation path.
+references:
+    - https://attack.mitre.org/techniques/T1078/
+    - https://attack.mitre.org/techniques/T1555/004/
+author: Krishxcybersec
+date: 2026-10-27
+tags:
+    - attack.privilege-escalation
+    - attack.defense-evasion
+    - attack.t1078
+    - attack.t1555.004
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\runas.exe'
+        CommandLine|contains: '/savecred'
+    condition: selection
+falsepositives:
+    - Administrative scripts that deliberately use saved credentials. These should be
+      known and attributable; a standard user account triggering this is not expected.
+level: high

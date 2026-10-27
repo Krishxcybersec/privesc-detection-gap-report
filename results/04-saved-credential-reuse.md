@@ -1,0 +1,83 @@
+# Technique 4 — Saved-Credential Reuse (cmdkey / runas /savecred)
+
+| | |
+|---|---|
+| **MITRE ATT&CK** | [T1078](https://attack.mitre.org/techniques/T1078/) — Valid Accounts · [T1555.004](https://attack.mitre.org/techniques/T1555/004/) — Credentials from Windows Credential Manager |
+| **Tactic** | Privilege Escalation, Defense Evasion, Credential Access |
+| **Starting point** | A standard user on a host where an admin credential was **saved** |
+| **Result if undetected** | Commands running as the saved (often admin) account |
+
+## What the weakness is
+
+Windows has a built-in password store, the **Credential Manager**, and a way to save a
+credential into it with the `cmdkey` command. Once a credential is saved, the `runas`
+command can start a program **as that account without asking for the password again**,
+using its `/savecred` option.
+
+This is convenient, but it means: if an administrator ever saved their credential on a
+machine, **anyone who later uses that machine** can run programs as that admin without
+knowing the password. The saved credential is tied to the machine profile, not to the
+person who saved it.
+
+**From your attacker side:** you listed saved credentials (`cmdkey /list`), saw a stored
+admin entry, and ran `runas /savecred /user:...` to get a shell as that admin, never
+needing the password. The weakness is a **convenience feature leaving an admin credential
+reusable** by a lower-privileged user.
+
+## How it looks to a defender
+
+### Signal A — a credential being saved (the cause)
+
+`cmdkey` storing a credential. This is the moment the reusable credential is created.
+
+- **Security 4688 / Sysmon 1** — `cmdkey.exe` with `/add` or `/generic` on its command line.
+
+### Signal B — the saved credential being reused (the abuse)
+
+`runas /savecred` launching a program, and the logon that follows.
+
+- **Security 4688 / Sysmon 1** — `runas.exe` with `/savecred`, and often a child shell
+  (`cmd.exe`, `powershell.exe`) whose parent is `runas.exe`.
+- **Security 4648** — "logon using explicit credentials", which fires when one account
+  runs something as another. A standard user triggering 4648 for an admin account is the
+  tell-tale.
+- **Security 4624** (a new logon) and **4672** (special privileges assigned) shortly after,
+  for the admin account.
+
+Watching 4648 **correlated** with a `runas /savecred` process is what separates abuse from
+noise — the same approach my 1.0 detector takes.
+
+## Detection logic (plain English)
+
+> **Alert — medium:** `cmdkey` is saving a credential (a reusable credential is being created).
+>
+> **Alert — high:** `runas /savecred` is used, especially by a standard user to run as an admin,
+> followed by an explicit-credential logon (4648) for that admin.
+
+## Sigma rules
+
+- [`../sigma-rules/04a_runas_savecred.yml`](../sigma-rules/04a_runas_savecred.yml) — a saved credential being reused (Signal B)
+- [`../sigma-rules/04b_cmdkey_credential_store.yml`](../sigma-rules/04b_cmdkey_credential_store.yml) — a credential being saved (Signal A)
+
+## What each defence should show (fill from the lab)
+
+| Defence | Detected? | What it showed | Screenshot |
+|---|---|---|---|
+| Microsoft Defender | _tbd_ | | |
+| Sysmon + community config | _tbd_ | | |
+| My own detector (1.0) | _tbd_ | | |
+
+## Analyst playbook (if this alert fires)
+
+1. **Confirm the reuse.** Which account ran `runas /savecred`, and as which account?
+2. **Find the saved credential.** Check Credential Manager on the host for stored admin entries.
+3. **Judge the risk.** A standard user running commands as an admin via a saved credential is
+   effectively a privilege escalation; treat the admin account as exposed on that host.
+4. **Contain.** Remove the saved credential (`cmdkey /delete`), and review what was run as the admin.
+5. **Prevent.** Discourage saving privileged credentials; use just-in-time admin access instead.
+
+## Hardening
+
+- Do not save administrator credentials with `cmdkey` on shared or standard-user machines.
+- Audit Credential Manager for stored privileged credentials.
+- Monitor `cmdkey /add` and `runas /savecred`, and correlate with 4648 explicit-credential logons.
