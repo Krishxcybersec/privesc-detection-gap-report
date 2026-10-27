@@ -74,6 +74,9 @@
 - [ ] Technique 4: same
 - [ ] Technique 5: same
 
+### Detection write-ups (done ahead of lab testing)
+- [x] All 5 technique detection packs written: `results/01..05`, each with 2 Sigma rules in `sigma-rules/`, MITRE tags, analyst playbooks. Committed.
+
 ### Write-up
 - [ ] Fill the coverage matrix in the README
 - [ ] Write a detection rule for each gap found
@@ -89,3 +92,4 @@
 - 2026-10-27 — ISO downloaded and hash-verified; attached to the VM. Next: open the VM in VMware and install Windows 11.
 - 2026-10-27 — overnight install on the USB HDD was far too slow; rebuilt the VM on C: (internal NVMe SSD). Next: fresh install on the new VM.
 - 2026-10-27 — lab base finished: Windows 11 Pro + VMware Tools + updates + password, snapshot "clean" taken. Next: build the 5 test conditions by hand (session 2), while the detection write-ups get drafted in parallel.
+- 2026-10-27 — all 5 detection packs written and committed (write-ups + 10 Sigma rules + matrix). Written half of the project is done. Next: lab testing to fill the matrix and capture screenshots.
