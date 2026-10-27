@@ -32,10 +32,25 @@
 ## Steps
 
 ### Session 1 — Windows 11 VM
-- [ ] Decide VirtualBox vs VMware (match the Linux VM)
-- [ ] Create the VM (store on D:), install Windows 11
+- [x] Decide VirtualBox vs VMware (match the Linux VM) → **VMware** (Kali was built in VMware)
+- [x] Create the VM shell in VMware on D: → `D:\VMs\Win11-Lab\` (disk + .vmx pre-built: UEFI, Secure Boot, software vTPM, 6 GB RAM, 4 vCPU, 60 GB SATA disk, NAT network)
+- [x] Download the Windows 11 ISO from Microsoft → `D:\ISOs\Win11_x64_en-us.iso` (8.43 GB, SHA-256 matches Microsoft's published "English 64-bit" hash)
+- [x] Attach the ISO to the VM (set in the .vmx, connects at power on)
+- [x] Open `D:\VMs\Win11-Lab\Win11-Lab.vmx` in VMware and start the Windows 11 Pro install
+  - Note: the VM has **no TPM** (the auto-add vTPM setting didn't apply); installed with the `LabConfig\BypassTPMCheck` installer flag. None of the five techniques or the compared defences depend on a TPM.
+  - Added `bios.bootDelay = "5000"` to the .vmx so there's time to catch "Press any key to boot from CD".
+- [ ] Finish Windows setup with a local account
+- [x] **Rebuilt the VM on C:** — D: is an external USB HDD (WD My Passport); the overnight install there took 2–9 s per disk operation and was only part-way after ~7 h, so it was powered off and abandoned. New VM: `C:\VMs\Win11-Lab\Win11-Lab.vmx` (display name **Win11-Lab-SSD**), ISO copied to `C:\ISOs\`. Same settings minus the auto-TPM line.
+  - The abandoned copy is still at `D:\VMs\Win11-Lab` — safe to delete once the new VM works.
+- [x] Install Windows 11 Pro on the new VM (tap Space at boot → Shift+F10 TPM bypass → Pro → Disk 0)
+- [x] Local account `labadmin` created with `start ms-cxh:localonly` (OOBE updates skipped)
+- [x] Set a password on `labadmin`
+- [x] VMware Tools installed (2026-10-27 18:01, status current); Windows ISO disconnected
+- [x] Windows Update complete, Defender definitions current
+- [x] Snapshot **"clean"** taken (2026-10-27) — roll back here if the VM ever breaks
+- [ ] Install VMware Tools (fixes screen size), then disconnect the ISO
 - [ ] Set network to host-only / isolated
-- [ ] Windows Update, then take snapshot **"clean"**
+- [x] Windows Update (running), then take snapshot **"clean"** → done 2026-10-27, snapshot name `clean`
 
 ### Session 2 — build the test conditions (by hand)
 - [ ] Apply condition 1 and note the exact steps
@@ -69,3 +84,8 @@
 ## Log
 
 - 2026-10-27 — project folder created; plan and structure set up. Nothing built in the VM yet.
+- 2026-10-27 — chose VMware for the Windows 11 VM (same as the Kali VM).
+- 2026-10-27 — pre-built the VM shell at D:\VMs\Win11-Lab (60 GB disk + Win11 .vmx). ISO still to download, then install.
+- 2026-10-27 — ISO downloaded and hash-verified; attached to the VM. Next: open the VM in VMware and install Windows 11.
+- 2026-10-27 — overnight install on the USB HDD was far too slow; rebuilt the VM on C: (internal NVMe SSD). Next: fresh install on the new VM.
+- 2026-10-27 — lab base finished: Windows 11 Pro + VMware Tools + updates + password, snapshot "clean" taken. Next: build the 5 test conditions by hand (session 2), while the detection write-ups get drafted in parallel.

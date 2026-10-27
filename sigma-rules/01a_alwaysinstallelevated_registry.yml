@@ -1,0 +1,29 @@
+title: AlwaysInstallElevated Policy Enabled
+id: 7a1b9f10-0c2e-4e8e-9a1a-1a2b3c4d5e01
+status: experimental
+description: >
+    Detects the Windows Installer AlwaysInstallElevated policy value being set to 1.
+    When enabled in both HKLM and HKCU, any MSI package installs with SYSTEM
+    privileges, which lets a standard user escalate. On a correctly configured host
+    these values are absent or 0, so this is a high-confidence, low-noise signal.
+references:
+    - https://attack.mitre.org/techniques/T1548/002/
+    - https://learn.microsoft.com/en-us/windows/win32/msi/alwaysinstallelevated
+author: Krishxcybersec
+date: 2026-10-27
+tags:
+    - attack.privilege-escalation
+    - attack.defense-evasion
+    - attack.t1548.002
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection:
+        TargetObject|endswith: '\Microsoft\Windows\Installer\AlwaysInstallElevated'
+        Details: 'DWORD (0x00000001)'
+    condition: selection
+falsepositives:
+    - Legacy software-deployment setups that deliberately enable this policy.
+      These should be documented exceptions, not the norm.
+level: high
