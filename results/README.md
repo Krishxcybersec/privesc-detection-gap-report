@@ -12,7 +12,7 @@ Legend: ✅ detected · ⚠️ partial (logged but no clear alert) · ❌ missed
 |---|-----------|--------|----------|-----------------|-------------------|
 | 1 | [AlwaysInstallElevated](01-alwaysinstallelevated.md) | T1548.002 | _tbd_ | _tbd_ | _tbd_ |
 | 2 | [Unquoted service path](02-unquoted-service-path.md) | T1574.009 | _tbd_ | _tbd_ | _tbd_ |
-| 3 | Backup-operator privilege abuse | T1003 | _tbd_ | _tbd_ | _tbd_ |
+| 3 | [Backup-operator privilege abuse](03-backup-privilege-abuse.md) | T1003.002 | _tbd_ | _tbd_ | _tbd_ |
 | 4 | Saved-credential reuse | T1078 / T1555 | _tbd_ | _tbd_ | _tbd_ |
 | 5 | Unattended-setup credentials | T1552.001 | _tbd_ | _tbd_ | _tbd_ |
 

@@ -1,0 +1,36 @@
+title: Credential Hive Copied via Backup-Capable Tools
+id: 7a1b9f10-0c2e-4e8e-9a1a-1a2b3c4d5e06
+status: experimental
+description: >
+    Detects backup-capable utilities (esentutl, diskshadow, robocopy in backup mode)
+    referencing the registry config folder or the SAM/SYSTEM/SECURITY hives. These are
+    quieter alternatives to reg.exe for copying credential material, typically abused by
+    an account that holds SeBackupPrivilege.
+references:
+    - https://attack.mitre.org/techniques/T1003/002/
+author: Krishxcybersec
+date: 2026-10-27
+tags:
+    - attack.credential-access
+    - attack.t1003.002
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_tool:
+        Image|endswith:
+            - '\esentutl.exe'
+            - '\diskshadow.exe'
+            - '\robocopy.exe'
+            - '\xcopy.exe'
+    selection_target:
+        CommandLine|contains:
+            - '\config\SAM'
+            - '\config\SYSTEM'
+            - '\config\SECURITY'
+            - '/b '
+    condition: selection_tool and selection_target
+falsepositives:
+    - Legitimate backup jobs run by the backup service account. Baseline those and alert
+      on the privilege being used from any other account or path.
+level: high
