@@ -14,7 +14,7 @@ Legend: ✅ detected · ⚠️ partial (logged but no clear alert) · ❌ missed
 | 2 | [Unquoted service path](02-unquoted-service-path.md) | T1574.009 | ❌ | ⚠️ | ✅ |
 | 3 | [Backup-operator privilege abuse](03-backup-privilege-abuse.md) | T1003.002 | ✅ | ⚠️ | ❌ |
 | 4 | [Saved-credential reuse](04-saved-credential-reuse.md) | T1078 / T1555.004 | ❌ | ⚠️ | ✅ |
-| 5 | [Unattended-setup credentials](05-unattended-setup-credentials.md) | T1552.001 | _tbd_ | _tbd_ | _tbd_ |
+| 5 | [Unattended-setup credentials](05-unattended-setup-credentials.md) | T1552.001 | ❌ | ⚠️ | ✅ |
 
 ## How each technique was tested
 

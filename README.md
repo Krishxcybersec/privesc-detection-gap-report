@@ -42,15 +42,37 @@ is a tool or instructions for attacking systems that are not mine.
 
 ## Coverage matrix
 
-*To be filled in as testing progresses.*
+Legend: ✅ detected · ⚠️ logged but not alerted · ❌ missed. Full per-technique evidence in
+[`results/`](results/).
 
-| Technique | Defender | Sysmon + config | My detectors |
-|-----------|----------|-----------------|--------------|
-| 1 | — | — | — |
-| 2 | — | — | — |
-| 3 | — | — | — |
-| 4 | — | — | — |
-| 5 | — | — | — |
+| Technique | Defender | Sysmon + config | My detectors (1.0) |
+|-----------|----------|-----------------|--------------------|
+| 1 — AlwaysInstallElevated | ❌ | ❌ | ✅ |
+| 2 — Unquoted service path | ❌ | ⚠️ | ✅ |
+| 3 — Backup / SAM dump | ✅ | ⚠️ | ❌ |
+| 4 — Saved-credential reuse | ❌ | ⚠️ | ✅ |
+| 5 — Unattended-setup creds | ❌ | ⚠️ | ✅ |
+
+## Conclusion
+
+The three defences have clearly different blind spots:
+
+- **Microsoft Defender** only caught one technique — the SAM dump (3) — because it matches
+  known malicious *behaviour*. It was **blind to every misconfiguration** (1, 2, 4, 5),
+  which are legitimate-looking actions. A company on Defender alone would not know these
+  weaknesses exist.
+- **Sysmon (community config)** had the telemetry for almost everything (⚠️) but **raised no
+  alerts** — the raw data is there, but turning it into a detection needs rules. Its one clean
+  miss (1) was a registry key the config simply doesn't watch.
+- **The purpose-built detectors** caught four of five — every misconfiguration the standard
+  tools missed. Their one miss (3) was the **polling design**: a millisecond-long command
+  slipped between 5-second checks. Sysmon, being event-driven, caught that same command — the
+  clearest evidence for the main 2.0 improvement: **move the detectors from polling to
+  event-driven.**
+
+**The gap:** misconfigurations that enable privilege escalation go unnoticed by the
+defences a typical organisation relies on. The Sigma rules in [`sigma-rules/`](sigma-rules/)
+close that gap by turning the available telemetry into alerts.
 
 ## Repository layout
 

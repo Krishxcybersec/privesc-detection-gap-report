@@ -60,13 +60,31 @@ second bullet), which process auditing catches without a SACL.
 - [`../sigma-rules/05a_unattend_file_read_cmd.yml`](../sigma-rules/05a_unattend_file_read_cmd.yml) — a command reading an unattended file (Signal B, process-based)
 - [`../sigma-rules/05b_unattend_file_access.yml`](../sigma-rules/05b_unattend_file_access.yml) — a file-access event on an unattended file (Signal B, audit-based)
 
-## What each defence should show (fill from the lab)
+## Results from the lab (unattended file read)
 
-| Defence | Detected? | What it showed | Screenshot |
-|---|---|---|---|
-| Microsoft Defender | _tbd_ | | |
-| Sysmon + community config | _tbd_ | | |
-| My own detector (1.0) | _tbd_ | | |
+Tested 2026-10-28 on `WIN-LAB`. An `Unattend.xml` with a (fake) password was placed in
+`C:\Windows\Panther`, and **read-auditing (a SACL) was switched on for it** so event 4663
+would fire. Then the file was read with `findstr Password ...`, which printed the password.
+
+| Defence | Detected? | What it showed |
+|---|---|---|
+| Microsoft Defender | ❌ Miss | Reading a file is not treated as a threat; only the earlier SAM-dump detection existed |
+| Sysmon + community config | ⚠️ Partial | Logged the `findstr` process that read the file (Event 1) — no alert |
+| My own detector (1.0) | ✅ **Detected** | Flagged `CRITICAL: Unauthorized read of Unattend.xml` via Event 4663 |
+
+**Finding:** the detector caught the read — but note the **dependency**: 4663 only fires
+because we first enabled a SACL on the file. Without that auditing step, the detector would
+be silent, which is the honest caveat recorded in the write-up above. Sysmon logged the
+reading process (telemetry present, no alert); Defender ignored it. Sigma rules `05a`
+(process-based) and `05b` (audit-based) turn these into alerts.
+
+> Tuning note: the detector flagged `labadmin` as "unauthorized" because its built-in
+> allow-list only covers `administrator/system/admin`. In a real run the read would be done
+> by the standard user (`labuser`); broadening that allow-list is a small tuning improvement.
+
+Evidence — the detector flags the unauthorized read:
+
+![Detector flags the Unattend.xml read](../screenshots/05-unattend-detector-catches.webp)
 
 ## Analyst playbook (if this alert fires)
 
