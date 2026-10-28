@@ -73,17 +73,22 @@ present (`0x1`). Then each defence was checked.
 |---|---|---|
 | Microsoft Defender | ❌ Miss | `Get-MpThreatDetection` count = 0; Defender does not inspect this policy value |
 | Sysmon + community config | ❌ Miss | No Event 13 for the `AlwaysInstallElevated` key. Sysmon *is* logging registry (≥5 other Event 13s present), so the gap is in the config's key coverage, not in Sysmon being off |
-| My own detector (1.0) | _tbd_ | polls this key directly — to be tested |
+| My own detector (1.0) | ✅ **Detected** | Flagged `CRITICAL: AlwaysInstallElevated exploitable (HKLM=1 & HKCU=1)` within ~2 seconds of polling — caught the exact misconfiguration the other two missed |
 
 **Finding:** a privilege-escalation misconfiguration that gives any installer SYSTEM
-rights can be enabled with **no alert from either standard defence**. Defender doesn't
-look at this policy, and the SwiftOnSecurity Sysmon config doesn't watch this registry
-key. The danger is that everything appears normal. Sigma rule `01a` closes this gap by
-alerting specifically on this value being set to `1`.
+rights can be enabled with **no alert from either standard defence** (Defender doesn't
+look at this policy; the SwiftOnSecurity Sysmon config doesn't watch this key). The
+purpose-built 1.0 detector, however, flagged it **CRITICAL within ~2 seconds**. So the
+gap is real, and a targeted detector closes it — which is exactly what Sigma rule `01a`
+does.
 
-Evidence:
+Evidence — the two standard defences miss it:
 
 ![Signal A — both defences miss the policy being enabled](../screenshots/01-alwaysinstallelevated-signalA-miss.webp)
+
+Evidence — the 1.0 detector catches it:
+
+![The 1.0 detector flags the misconfiguration as CRITICAL](../screenshots/01-alwaysinstallelevated-detector-catches.webp)
 
 ## Analyst playbook (if this alert fires)
 
