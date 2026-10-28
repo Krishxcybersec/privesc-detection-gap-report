@@ -11,7 +11,7 @@ Legend: ✅ detected · ⚠️ partial (logged but no clear alert) · ❌ missed
 | # | Technique | ATT&CK | Defender | Sysmon + config | My detector (1.0) |
 |---|-----------|--------|----------|-----------------|-------------------|
 | 1 | [AlwaysInstallElevated](01-alwaysinstallelevated.md) | T1548.002 | ❌ | ❌ | ✅ |
-| 2 | [Unquoted service path](02-unquoted-service-path.md) | T1574.009 | _tbd_ | _tbd_ | _tbd_ |
+| 2 | [Unquoted service path](02-unquoted-service-path.md) | T1574.009 | ❌ | ⚠️ | ✅ |
 | 3 | [Backup-operator privilege abuse](03-backup-privilege-abuse.md) | T1003.002 | _tbd_ | _tbd_ | _tbd_ |
 | 4 | [Saved-credential reuse](04-saved-credential-reuse.md) | T1078 / T1555.004 | _tbd_ | _tbd_ | _tbd_ |
 | 5 | [Unattended-setup credentials](05-unattended-setup-credentials.md) | T1552.001 | _tbd_ | _tbd_ | _tbd_ |

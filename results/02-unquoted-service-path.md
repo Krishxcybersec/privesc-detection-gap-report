@@ -67,13 +67,31 @@ access to create an account or add someone to a group, those show up too.
 - [`../sigma-rules/02a_unquoted_service_path_binary_planted.yml`](../sigma-rules/02a_unquoted_service_path_binary_planted.yml) — hijack binary appearing (Signal B)
 - [`../sigma-rules/02b_unquoted_service_path_exec.yml`](../sigma-rules/02b_unquoted_service_path_exec.yml) — hijack binary running from a service (Signal C)
 
-## What each defence should show (fill from the lab)
+## Results from the lab (Signal A — the vulnerable service exists)
 
-| Defence | Detected? | What it showed | Screenshot |
-|---|---|---|---|
-| Microsoft Defender | _tbd_ | | |
-| Sysmon + community config | _tbd_ | | |
-| My own detector (1.0) | _tbd_ | | |
+Tested 2026-10-28 on `WIN-LAB`. A service `vulnsvc` was created with an unquoted path
+containing spaces (`C:\Program Files\Vuln App\vulnservice.exe`), running as `LocalSystem`.
+Then each defence was checked.
+
+| Defence | Detected? | What it showed |
+|---|---|---|
+| Microsoft Defender | ❌ Miss | `Get-MpThreatDetection` count = 0; Defender does not inspect service configuration |
+| Sysmon + community config | ⚠️ Partial | Logged the service creation (Event 1 = the `sc.exe create` command, Event 13 = the service's registry keys) but raised **no alert** — the raw telemetry is present, yet nothing flags the path as unquoted and exploitable |
+| My own detector (1.0) | ✅ **Detected** | Enumerated services and flagged `vulnsvc` by name, listing the exact hijack paths: `C:\Program.exe` and `C:\Program Files\Vuln.exe` |
+
+**Finding:** only the purpose-built detector *identified the vulnerability*. Defender
+ignored it entirely; Sysmon **captured the activity but didn't flag the risk** — a skilled
+analyst could spot the missing quotes by reading the Event 1 command line, but no alert
+fired. This is the gap between **logging** and **detecting**, and it's exactly what Sigma
+rules `02a`/`02b` close: they turn Sysmon's raw telemetry into an actual alert.
+
+Evidence — the detector flags the vulnerable service and its hijack paths:
+
+![Detector flags vulnsvc and its candidate hijack paths](../screenshots/02-unquoted-detector-catches.png)
+
+Evidence — Defender finds nothing (0); Sysmon logged it (Events 1 and 13) but didn't flag it:
+
+![Defender count 0; Sysmon logged the creation](../screenshots/02-unquoted-defender-sysmon.webp)
 
 ## Analyst playbook (if this alert fires)
 
