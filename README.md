@@ -25,6 +25,11 @@ is a tool or instructions for attacking systems that are not mine.
 
 *(Wazuh SIEM may be added in a later version.)*
 
+> The 1.0 detectors were developed with AI assistance against publicly documented
+> techniques (MITRE ATT&CK, Microsoft), then tested, tuned, and evaluated here against
+> Microsoft Defender and Sysmon in an isolated lab. The detection engineering, the
+> testing methodology, and the results in this report are my own.
+
 ## Techniques tested
 
 | # | Technique | MITRE ATT&CK |
