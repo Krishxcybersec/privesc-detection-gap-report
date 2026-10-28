@@ -1,6 +1,7 @@
 # Windows Privilege-Escalation: Detection Gap Report
 
-> A defensive security research project. *Work in progress.*
+> A defensive security research project. Five privilege-escalation techniques tested
+> against three defences in an isolated lab — see the coverage matrix below.
 
 ## The question
 
@@ -80,10 +81,14 @@ close that gap by turning the available telemetry into alerts.
 - [`sigma-rules/`](sigma-rules/) — the detection rules, in Sigma format, with MITRE tags
 - [`TESTING-PLAN.md`](TESTING-PLAN.md) — how each technique is tested and recorded
 - [`EVENT-IDS.md`](EVENT-IDS.md) — cheat sheet of the Windows event IDs these detections use
-- `screenshots/` — evidence captured from the lab (added during testing)
-- `lab-setup.md` — how the isolated test VM was built (added during testing)
+- [`lab-setup.md`](lab-setup.md) — how the isolated test VM was built
+- [`screenshots/`](screenshots/) — evidence captured from the lab
 
 ## Status
 
-Detection write-ups and Sigma rules are complete; lab testing is in progress.
-See [`LAB-PROGRESS.md`](LAB-PROGRESS.md) for the current step.
+**Complete.** All five techniques were tested in the lab; the coverage matrix, the
+per-technique evidence, the Sigma rules, and the conclusion are all in place.
+[`LAB-PROGRESS.md`](LAB-PROGRESS.md) has the full build log.
+
+Possible next steps (noted in the conclusion): move the detectors from polling to
+event-driven, and add a Wazuh SIEM as a fourth defence.
