@@ -64,13 +64,24 @@ they do not turn on by accident.
 - [`../sigma-rules/01a_alwaysinstallelevated_registry.yml`](../sigma-rules/01a_alwaysinstallelevated_registry.yml) — the policy being enabled (Signal A)
 - [`../sigma-rules/01b_alwaysinstallelevated_msiexec_child.yml`](../sigma-rules/01b_alwaysinstallelevated_msiexec_child.yml) — a SYSTEM child of msiexec (Signal B)
 
-## What each defence should show (fill from the lab)
+## Results from the lab (Signal A — policy enabled)
 
-| Defence | Detected? | What it showed | Screenshot |
-|---|---|---|---|
-| Microsoft Defender | _tbd_ | | |
-| Sysmon + community config | _tbd_ | | |
-| My own detector (1.0) | _tbd_ | | |
+Tested 2026-10-28 on the `WIN-LAB` VM. Both registry values were set to `1`, confirmed
+present (`0x1`). Then each defence was checked.
+
+| Defence | Detected? | What it showed |
+|---|---|---|
+| Microsoft Defender | ❌ Miss | `Get-MpThreatDetection` count = 0; Defender does not inspect this policy value |
+| Sysmon + community config | ❌ Miss | No Event 13 for the `AlwaysInstallElevated` key. Sysmon *is* logging registry (≥5 other Event 13s present), so the gap is in the config's key coverage, not in Sysmon being off |
+| My own detector (1.0) | _tbd_ | polls this key directly — to be tested |
+
+**Finding:** a privilege-escalation misconfiguration that gives any installer SYSTEM
+rights can be enabled with **no alert from either standard defence**. Defender doesn't
+look at this policy, and the SwiftOnSecurity Sysmon config doesn't watch this registry
+key. The danger is that everything appears normal. Sigma rule `01a` closes this gap by
+alerting specifically on this value being set to `1`.
+
+> Screenshot: `screenshots/01-alwaysinstallelevated-signalA-miss.png` (to add)
 
 ## Analyst playbook (if this alert fires)
 
