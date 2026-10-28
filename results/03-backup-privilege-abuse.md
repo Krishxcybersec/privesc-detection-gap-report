@@ -60,13 +60,36 @@ hive**. Real backups use shadow copies through the backup service, not a user ru
 - [`../sigma-rules/03a_sam_hive_dump_reg.yml`](../sigma-rules/03a_sam_hive_dump_reg.yml) — `reg.exe` saving a password hive (Signal B)
 - [`../sigma-rules/03b_sam_hive_copy_backup_tools.yml`](../sigma-rules/03b_sam_hive_copy_backup_tools.yml) — backup tools copying the hives (Signal B, quieter variants)
 
-## What each defence should show (fill from the lab)
+## Results from the lab (Signal B — SAM/SYSTEM hives dumped)
 
-| Defence | Detected? | What it showed | Screenshot |
-|---|---|---|---|
-| Microsoft Defender | _tbd_ | | |
-| Sysmon + community config | _tbd_ | | |
-| My own detector (1.0) | _tbd_ | | |
+Tested 2026-10-28 on `WIN-LAB`. With the detector running, `reg save hklm\sam` and
+`reg save hklm\system` were run from an admin shell. The SYSTEM save succeeded; the **SAM
+save was blocked**.
+
+| Defence | Detected? | What it showed |
+|---|---|---|
+| Microsoft Defender | ✅ **Detected & blocked** | Flagged the command `reg.exe save hklm\sam ...` (ThreatID 2147840094) and blocked it — the `reg save hklm\sam` returned an error because Defender stopped it. The non-credential SYSTEM hive save was allowed |
+| Sysmon + community config | ⚠️ Partial | Logged both `reg.exe save` commands as Event 1 (process create, event-driven) — so it captured what the detector missed — but raised **no alert** |
+| My own detector (1.0) | ❌ Miss | Polls every 5 seconds; `reg.exe` runs in milliseconds, so the process was gone before the next poll. The documented polling limitation, confirmed in the lab |
+
+**Finding:** this technique flips the pattern. Defender is **strong against known malicious
+behaviour** — it recognised and blocked the SAM dump by its command line — while it was
+blind to the misconfigurations in techniques 1–2. Sysmon's event-driven logging **caught
+what the polling detector missed**, which is the clearest possible evidence for the 2.0
+improvement: move the detectors from polling to event-driven (ETW/WMI), exactly as Sigma
+rule `03a` does by matching the `reg save` command line the instant it runs.
+
+Evidence — the polling detector missed it (only "Monitoring...", no alert):
+
+![Detector did not alert](../screenshots/03-backup-detector-missed.png)
+
+Evidence — Defender detected and blocked the SAM dump:
+
+![Defender flagged the reg.exe SAM-save command](../screenshots/03-backup-defender-blocks.png)
+
+Evidence — Sysmon logged both reg commands (Event 1), event-driven:
+
+![Sysmon captured both reg save commands](../screenshots/03-backup-sysmon-logged.webp)
 
 ## Analyst playbook (if this alert fires)
 
