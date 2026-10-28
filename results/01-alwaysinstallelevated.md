@@ -81,7 +81,9 @@ look at this policy, and the SwiftOnSecurity Sysmon config doesn't watch this re
 key. The danger is that everything appears normal. Sigma rule `01a` closes this gap by
 alerting specifically on this value being set to `1`.
 
-> Screenshot: `screenshots/01-alwaysinstallelevated-signalA-miss.png` (to add)
+Evidence:
+
+![Signal A — both defences miss the policy being enabled](../screenshots/01-alwaysinstallelevated-signalA-miss.webp)
 
 ## Analyst playbook (if this alert fires)
 
