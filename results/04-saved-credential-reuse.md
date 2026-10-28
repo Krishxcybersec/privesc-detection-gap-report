@@ -59,13 +59,35 @@ noise — the same approach my 1.0 detector takes.
 - [`../sigma-rules/04a_runas_savecred.yml`](../sigma-rules/04a_runas_savecred.yml) — a saved credential being reused (Signal B)
 - [`../sigma-rules/04b_cmdkey_credential_store.yml`](../sigma-rules/04b_cmdkey_credential_store.yml) — a credential being saved (Signal A)
 
-## What each defence should show (fill from the lab)
+## Results from the lab (saved-credential reuse)
 
-| Defence | Detected? | What it showed | Screenshot |
-|---|---|---|---|
-| Microsoft Defender | _tbd_ | | |
-| Sysmon + community config | _tbd_ | | |
-| My own detector (1.0) | _tbd_ | | |
+Tested 2026-10-28 on `WIN-LAB`. With the detector running, `cmdkey /list` and
+`runas /savecred /user:WIN-LAB\labadmin "cmd.exe /c whoami"` were run (the second succeeded,
+spawning a shell as labadmin).
+
+| Defence | Detected? | What it showed |
+|---|---|---|
+| Microsoft Defender | ❌ Miss | `Get-MpThreatDetection` listed only the earlier SAM dump (22:52, technique 3); nothing for cmdkey/runas (23:09–23:10). Defender treats these built-in admin tools as legitimate |
+| Sysmon + community config | ⚠️ Partial | Logged the `runas.exe` and `cmdkey.exe` processes (four Event 1s) but raised **no alert** |
+| My own detector (1.0) | ✅ **Detected** | Caught the full chain and **correlated** it: `CMDKEY_Usage`, `RUNAS_SaveCred` (both attempts), `Post-Runas_Logon_4624`, `SpecialPrivs_4672`, and the `RUNAS_ChildShell`. Event-driven (reads the Security log), so no polling gap |
+
+**Finding:** the detector's strongest result — it didn't just match one event, it **joined
+related events into a story** (the saved-cred reuse, the resulting logon, the elevated
+privileges, the spawned shell). It caught everything precisely because it is **event-driven**,
+the direct contrast to technique 3's polling miss. Defender saw nothing (legit tools), and
+Sysmon had the telemetry but raised no alert — a gap Sigma rules `04a`/`04b` close.
+
+> A verification note worth keeping: Defender's threat count showed `1`, which looked like a
+> technique-4 hit — but checking the detail showed it was the leftover SAM-dump detection from
+> technique 3. Always confirm what a count actually is before reporting it.
+
+Evidence — the detector catches the full correlated chain:
+
+![Detector alerts on the full saved-credential chain](../screenshots/04-savedcred-detector-catches.webp)
+
+Evidence — Defender's only hit is the old SAM dump; Sysmon logged the processes:
+
+![Defender detail shows the old SAM dump; Sysmon logged runas/cmdkey](../screenshots/04-savedcred-defender-sysmon.webp)
 
 ## Analyst playbook (if this alert fires)
 
