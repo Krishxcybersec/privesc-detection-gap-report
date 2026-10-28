@@ -10,10 +10,10 @@
   (which defence caught what, which missed, and why), and write detection rules to
   close the gaps.
 - **Defences compared (first version):** Microsoft Defender (built in), Sysmon with a
-  community config, and my own detectors from the MSc dissertation (1.0).
+  community config, and my own detectors from the 1.0 project.
 - **Optional later:** Wazuh (free SIEM), using the Linux VM as the Wazuh server.
 - **Lab is built by hand on a brand-new, isolated Windows 11 VM.** No third-party
-  lab-setup script is used in 2.0. The 1.0 dissertation keeps its original credit.
+  lab-setup script is used in 2.0. The 1.0 project keeps its original credit.
 - **Host:** 16 GB RAM, Intel Core Ultra 7 155H, VMs on D: (679 GB free).
   VirtualBox and VMware are both installed.
 - **Keep the Linux VM powered off** during Windows sessions to save RAM.

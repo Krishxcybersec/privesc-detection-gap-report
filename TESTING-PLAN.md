@@ -56,7 +56,7 @@ back to this before each technique, so every test starts identical.
 ### Where to get the setup/trigger steps
 These are standard, documented procedures — use authoritative references rather than
 reinventing them:
-- **Your own 1.0 dissertation lab** already set up all five conditions once.
+- **Your own 1.0 lab** already set up all five conditions once.
 - **MITRE ATT&CK** pages (linked in each technique's write-up) describe each one.
 - **Microsoft Learn** documents each setting (`AlwaysInstallElevated`, service paths,
   `SeBackupPrivilege`, `cmdkey`, unattended answer files).

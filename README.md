@@ -22,7 +22,7 @@ is a tool or instructions for attacking systems that are not mine.
 |---|---|
 | Microsoft Defender (built in) | A typical out-of-the-box Windows machine |
 | Sysmon + community config | A team that has added extra logging |
-| My own detectors (MSc dissertation, **1.0** — separate repo) | Purpose-built detection for these techniques |
+| My own detectors (**1.0** — separate repo) | Purpose-built detection for these techniques |
 
 *(Wazuh SIEM may be added in a later version.)*
 
