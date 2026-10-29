@@ -39,7 +39,7 @@
 - [x] Open `D:\VMs\Win11-Lab\Win11-Lab.vmx` in VMware and start the Windows 11 Pro install
   - Note: the VM has **no TPM** (the auto-add vTPM setting didn't apply); installed with the `LabConfig\BypassTPMCheck` installer flag. None of the five techniques or the compared defences depend on a TPM.
   - Added `bios.bootDelay = "5000"` to the .vmx so there's time to catch "Press any key to boot from CD".
-- [ ] Finish Windows setup with a local account
+- [x] Finish Windows setup with a local account
 - [x] **Rebuilt the VM on C:** — D: is an external USB HDD (WD My Passport); the overnight install there took 2–9 s per disk operation and was only part-way after ~7 h, so it was powered off and abandoned. New VM: `C:\VMs\Win11-Lab\Win11-Lab.vmx` (display name **Win11-Lab-SSD**), ISO copied to `C:\ISOs\`. Same settings minus the auto-TPM line.
   - The abandoned copy is still at `D:\VMs\Win11-Lab` — safe to delete once the new VM works.
 - [x] Install Windows 11 Pro on the new VM (tap Space at boot → Shift+F10 TPM bypass → Pro → Disk 0)
@@ -48,18 +48,19 @@
 - [x] VMware Tools installed (2026-10-27 18:01, status current); Windows ISO disconnected
 - [x] Windows Update complete, Defender definitions current
 - [x] Snapshot **"clean"** taken (2026-10-27) — roll back here if the VM ever breaks
-- [ ] Install VMware Tools (fixes screen size), then disconnect the ISO
-- [ ] Set network to host-only / isolated
+- [x] Install VMware Tools (fixes screen size), then disconnect the ISO
+- [~] Network: kept on VMware NAT (so the Kali VM could reach it for the payload step);
+  isolation came from this being a disposable, dedicated lab VM rather than host-only
 - [x] Windows Update (running), then take snapshot **"clean"** → done 2026-10-27, snapshot name `clean`
 
 ### Session 2 — build the test conditions (by hand)
-- [ ] Apply condition 1 and note the exact steps
-- [ ] Apply condition 2 and note the exact steps
-- [ ] Apply condition 3 and note the exact steps
-- [ ] Apply condition 4 and note the exact steps
-- [ ] Apply condition 5 and note the exact steps
-- [ ] Write `lab-setup.md` in my own words
-- [ ] Take snapshot **"lab-ready"**
+- [x] Apply condition 1 and note the exact steps
+- [x] Apply condition 2 and note the exact steps
+- [x] Apply condition 3 and note the exact steps
+- [x] Apply condition 4 and note the exact steps
+- [x] Apply condition 5 and note the exact steps
+- [x] Write `lab-setup.md` in my own words
+- [x] Take snapshot **"lab-ready"**
 
 ### Session 3 — logging tools
 - [x] Confirm Microsoft Defender is on (real-time protection True, signatures 27/10/2026)
@@ -71,21 +72,21 @@
 - [x] Take snapshot **"lab-ready"** (2026-10-27, VM running; snapshots now: clean, updated, lab-ready). Roll back to this before every technique.
 
 ### Per-technique sessions (x5) — one at a time
-- [ ] Technique 1: run in lab, record what each defence showed, screenshot, fill matrix row
-- [ ] Technique 2: same
-- [ ] Technique 3: same
-- [ ] Technique 4: same
-- [ ] Technique 5: same
+- [x] Technique 1: run in lab, record what each defence showed, screenshot, fill matrix row
+- [x] Technique 2: same
+- [x] Technique 3: same
+- [x] Technique 4: same
+- [x] Technique 5: same
 
 ### Detection write-ups (done ahead of lab testing)
 - [x] All 5 technique detection packs written: `results/01..05`, each with 2 Sigma rules in `sigma-rules/`, MITRE tags, analyst playbooks. Committed.
 
 ### Write-up
-- [ ] Fill the coverage matrix in the README
-- [ ] Write a detection rule for each gap found
-- [ ] Write the per-technique analysis and analyst notes
-- [ ] Final README, screenshots, link from the main portfolio
-- [ ] Publish (private first, review, then public)
+- [x] Fill the coverage matrix in the README
+- [x] Write a detection rule for each gap found
+- [x] Write the per-technique analysis and analyst notes
+- [x] Final README, screenshots, link from the main portfolio
+- [x] Publish (private first, review, then public)
 
 ## Log
 

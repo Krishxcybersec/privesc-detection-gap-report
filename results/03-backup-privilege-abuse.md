@@ -66,6 +66,14 @@ Tested 2026-10-28 on `WIN-LAB`. With the detector running, `reg save hklm\sam` a
 `reg save hklm\system` were run from an admin shell. The SYSTEM save succeeded; the **SAM
 save was blocked**.
 
+**Scope of this test (precise claims):**
+- ✅ Suspicious activity observed — the `reg save` of credential hives
+- ❌ Privilege-escalation path demonstrated — the `reg save` was run from an **administrative**
+  shell to generate the telemetry; this is **not** a non-admin Backup Operators account
+  escalating, and no hashes were extracted
+- ✅ Detection validated — **Defender blocked** the SAM save; Sysmon logged both commands;
+  the polling detector missed them (its documented timing limitation)
+
 | Defence | Detected? | What it showed |
 |---|---|---|
 | Microsoft Defender | ✅ **Detected & blocked** | Flagged the command `reg.exe save hklm\sam ...` (ThreatID 2147840094) and blocked it — the `reg save hklm\sam` returned an error because Defender stopped it. The non-credential SYSTEM hive save was allowed |

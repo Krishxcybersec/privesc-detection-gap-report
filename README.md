@@ -26,10 +26,12 @@ is a tool or instructions for attacking systems that are not mine.
 
 *(Wazuh SIEM may be added in a later version.)*
 
-> The 1.0 detectors were developed with AI assistance against publicly documented
-> techniques (MITRE ATT&CK, Microsoft), then tested, tuned, and evaluated here against
-> Microsoft Defender and Sysmon in an isolated lab. The detection engineering, the
-> testing methodology, and the results in this report are my own.
+> **On authorship:** I performed and documented the five privilege-escalation lab
+> exercises, analysed the resulting Windows security events, and compared how different
+> defences responded. The Python detection scripts (1.0) were generated with AI assistance
+> and used in the research. My own contribution is the hands-on testing, the interpretation
+> of the observed results, the evaluation of detection limitations, and the security
+> reporting — not independent development of the Python.
 
 ## Techniques tested
 
@@ -53,6 +55,20 @@ Legend: ✅ detected · ⚠️ logged but not alerted · ❌ missed. Full per-te
 | 3 — Backup / SAM dump | ✅ | ⚠️ | ❌ |
 | 4 — Saved-credential reuse | ❌ | ⚠️ | ✅ |
 | 5 — Unattended-setup creds | ❌ | ⚠️ | ✅ |
+
+## Scope — what this study does and does not show
+
+To be precise about the evidence (each technique's page breaks this down):
+
+- **This is a detection and misconfiguration study, not a chain of completed exploits.**
+- For every technique I confirmed the **vulnerable configuration** and/or the **suspicious
+  activity**, and **validated what each defence detected**.
+- I did **not** demonstrate full end-to-end privilege escalation to SYSTEM for every
+  technique. In several cases the "attacker" action was performed from an administrative
+  shell to generate the telemetry, or the exploit step was blocked (e.g. Defender stopped
+  the Metasploit payload in technique 1). Those are noted honestly on each page.
+- The value here is the **detection coverage comparison** — which defences notice which
+  weaknesses — not a claim of owning the box five times over.
 
 ## Conclusion
 

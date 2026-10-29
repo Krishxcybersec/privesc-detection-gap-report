@@ -66,6 +66,14 @@ Tested 2026-10-28 on `WIN-LAB`. An `Unattend.xml` with a (fake) password was pla
 `C:\Windows\Panther`, and **read-auditing (a SACL) was switched on for it** so event 4663
 would fire. Then the file was read with `findstr Password ...`, which printed the password.
 
+**Scope of this test (precise claims):**
+- ✅ Vulnerable configuration found — an answer file containing a (fake) password in `Panther`
+- ✅ Suspicious activity observed — the file being read
+- ❌ Low-privilege exposure demonstrated — the read was performed as `labadmin`, and the
+  detector flagged it only because its hard-coded allow-list does not include `labadmin`; a
+  true standard-user (`labuser`) read was not carried through
+- ✅ Detection validated — the 1.0 detector flagged the read via Event 4663 (with the SACL enabled)
+
 | Defence | Detected? | What it showed |
 |---|---|---|
 | Microsoft Defender | ❌ Miss | Reading a file is not treated as a threat; only the earlier SAM-dump detection existed |

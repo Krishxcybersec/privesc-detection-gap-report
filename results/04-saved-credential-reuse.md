@@ -65,6 +65,13 @@ Tested 2026-10-28 on `WIN-LAB`. With the detector running, `cmdkey /list` and
 `runas /savecred /user:WIN-LAB\labadmin "cmd.exe /c whoami"` were run (the second succeeded,
 spawning a shell as labadmin).
 
+**Scope of this test (precise claims):**
+- ✅ Suspicious activity observed — `cmdkey` and `runas /savecred`, and the resulting logon
+- ⚠️ Privilege-escalation path demonstrated — `runas /savecred` ran a command as `labadmin`,
+  but this was **not** a clean standard-user → administrator transition using a credential a
+  standard user should not have had; it shows the technique's footprint, not a full escalation
+- ✅ Detection validated — the 1.0 detector caught the full correlated chain (cmdkey, runas, logon, privileges, child shell)
+
 | Defence | Detected? | What it showed |
 |---|---|---|
 | Microsoft Defender | ❌ Miss | `Get-MpThreatDetection` listed only the earlier SAM dump (22:52, technique 3); nothing for cmdkey/runas (23:09–23:10). Defender treats these built-in admin tools as legitimate |

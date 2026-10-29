@@ -69,6 +69,13 @@ they do not turn on by accident.
 Tested 2026-10-28 on the `WIN-LAB` VM. Both registry values were set to `1`, confirmed
 present (`0x1`). Then each defence was checked.
 
+**Scope of this test (precise claims):**
+- ✅ Vulnerable configuration found — the policy enabled in both `HKLM` and `HKCU`
+- ✅ Suspicious activity observed — the registry change itself
+- ❌ Full exploitation to SYSTEM demonstrated — a Metasploit MSI was prepared, but **Defender
+  blocked the payload on download**, so a SYSTEM shell was **not** obtained in this test
+- ✅ Detection validated — the 1.0 detector flagged the exploitable policy; Defender and Sysmon did not
+
 | Defence | Detected? | What it showed |
 |---|---|---|
 | Microsoft Defender | ❌ Miss | `Get-MpThreatDetection` count = 0; Defender does not inspect this policy value |

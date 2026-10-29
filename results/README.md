@@ -33,4 +33,6 @@ The interesting result is **the gaps** — the ❌ and ⚠️ cells. Each gap is
 company running that defence would miss the attack, and each one is answered by a Sigma
 rule in [`../sigma-rules/`](../sigma-rules/) that would have caught it.
 
-> Testing is in progress; cells fill in as each technique is run in the lab.
+> All five techniques have been run and the matrix is complete. Each technique's page states
+> precisely what was demonstrated — vulnerable configuration found, activity observed,
+> whether exploitation was carried through, and which defence validated the detection.

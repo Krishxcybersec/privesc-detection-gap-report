@@ -73,6 +73,13 @@ Tested 2026-10-28 on `WIN-LAB`. A service `vulnsvc` was created with an unquoted
 containing spaces (`C:\Program Files\Vuln App\vulnservice.exe`), running as `LocalSystem`.
 Then each defence was checked.
 
+**Scope of this test (precise claims):**
+- ✅ Vulnerable configuration found — an unquoted service path with spaces, running as SYSTEM
+- ⚠️ Suspicious activity observed — the service creation was logged (not the hijack)
+- ❌ Full exploitation demonstrated — **no binary was planted** at the hijack path and the
+  service was **not** made to run it, so execution-hijack to SYSTEM was not carried through
+- ✅ Detection validated — the 1.0 detector identified the vulnerable service and its hijack paths
+
 | Defence | Detected? | What it showed |
 |---|---|---|
 | Microsoft Defender | ❌ Miss | `Get-MpThreatDetection` count = 0; Defender does not inspect service configuration |
