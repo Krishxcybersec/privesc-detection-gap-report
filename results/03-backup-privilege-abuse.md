@@ -63,39 +63,41 @@ hive**. Real backups use shadow copies through the backup service, not a user ru
 ## Results from the lab (Signal B — SAM/SYSTEM hives dumped)
 
 Tested 2026-10-28 on `WIN-LAB`. With the detector running, `reg save hklm\sam` and
-`reg save hklm\system` were run from an admin shell. The SYSTEM save succeeded; the **SAM
-save was blocked**.
+`reg save hklm\system` were run from an admin shell. The SYSTEM save completed; the **SAM
+save returned an error, and Defender reported blocking it**.
 
 **Scope of this test (precise claims):**
 - ✅ Suspicious activity observed — the `reg save` of credential hives
 - ❌ Privilege-escalation path demonstrated — the `reg save` was run from an **administrative**
   shell to generate the telemetry; this is **not** a non-admin Backup Operators account
   escalating, and no hashes were extracted
-- ✅ Detection validated — **Defender blocked** the SAM save; Sysmon logged both commands;
-  the polling detector missed them (its documented timing limitation)
+- ✅ Detection validated — **Defender recorded the SAM save and reported blocking it**; Sysmon
+  recorded two matching process events; the polling detector missed them (its documented
+  timing limitation)
 
 | Defence | Detected? | What it showed |
 |---|---|---|
-| Microsoft Defender | ✅ **Detected & blocked** | Flagged the command `reg.exe save hklm\sam ...` (ThreatID 2147840094) and blocked it — the `reg save hklm\sam` returned an error because Defender stopped it. The non-credential SYSTEM hive save was allowed |
-| Sysmon + community config | ⚠️ Partial | Logged both `reg.exe save` commands as Event 1 (process create, event-driven) — so it captured what the detector missed — but raised **no alert** |
+| Microsoft Defender | ✅ **Detected; reported blocked** | Recorded a detection for `reg.exe save hklm\sam ...` (ThreatID 2147840094) with action *blocked*, and the `reg save hklm\sam` command returned an error at the same moment. Together these indicate the block; the absence of an output file was **not** separately checked. The SYSTEM hive save completed |
+| Sysmon + community config | ⚠️ Telemetry, no alert | Two Event 1 (process-create) records matched a search for `reg.exe` + `save`, at the times the two commands were run. The screenshot shows their timestamps, not their full command lines, so each is matched to its hive by timing and order. No alert, which is expected: Sysmon records events, it doesn't alert on them |
 | My own detector (1.0) | ❌ Miss | Polls every 3 seconds; `reg.exe` runs in milliseconds, so the process was gone before the next poll. The documented polling limitation, confirmed in the lab |
 
 **Finding:** this technique flips the pattern. Defender is **strong against known malicious
-behaviour** — it recognised and blocked the SAM dump by its command line — while it was
+behaviour** — it flagged the SAM dump by its command line and reported blocking it — while it was
 blind to the misconfigurations in techniques 1–2. Sysmon's event-driven logging **caught
 what the polling detector missed**, which is the clearest possible evidence for the 2.0
-improvement: move the detectors from polling to event-driven (ETW/WMI), exactly as Sigma
-rule `03a` does by matching the `reg save` command line the instant it runs.
+improvement: move the detectors from polling to event-driven (ETW/WMI). Sigma rule `03a`
+takes the same approach, matching the `reg save` command line in the process-creation event
+(experimental, not yet validated).
 
 Evidence — the polling detector missed it (only "Monitoring...", no alert):
 
 ![Detector did not alert](../screenshots/03-backup-detector-missed.png)
 
-Evidence — Defender detected and blocked the SAM dump:
+Evidence — Defender's detection record for the SAM-save command:
 
 ![Defender flagged the reg.exe SAM-save command](../screenshots/03-backup-defender-blocks.png)
 
-Evidence — Sysmon logged both reg commands (Event 1), event-driven:
+Evidence — two Sysmon Event 1 records at the times of the two reg commands (timestamps shown):
 
 ![Sysmon captured both reg save commands](../screenshots/03-backup-sysmon-logged.webp)
 

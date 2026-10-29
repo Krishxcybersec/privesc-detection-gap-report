@@ -45,8 +45,13 @@ is a tool or instructions for attacking systems that are not mine.
 
 ## Coverage matrix
 
-Legend: ✅ detected · ⚠️ logged but not alerted · ❌ missed. Full per-technique evidence in
-[`results/`](results/).
+Legend: ✅ detected · ⚠️ telemetry recorded, no alert · ❌ not detected in this test. Full
+per-technique evidence in [`results/`](results/).
+
+Note on Sysmon: it is a **logging** tool, not an alerting engine, so ⚠️ is its expected best
+result on its own. It records the activity, and turning that into an alert needs rules (such
+as Sigma) running in a SIEM. A ⚠️ for Sysmon is therefore a measure of *visibility*, not a
+failure.
 
 | Technique | Defender | Sysmon + config | My detectors (1.0) |
 |-----------|----------|-----------------|--------------------|
@@ -74,22 +79,25 @@ To be precise about the evidence (each technique's page breaks this down):
 
 The three defences have clearly different blind spots:
 
-- **Microsoft Defender** only caught one technique — the SAM dump (3) — because it matches
-  known malicious *behaviour*. It was **blind to every misconfiguration** (1, 2, 4, 5),
-  which are legitimate-looking actions. A company on Defender alone would not know these
-  weaknesses exist.
-- **Sysmon (community config)** had the telemetry for almost everything (⚠️) but **raised no
-  alerts** — the raw data is there, but turning it into a detection needs rules. Its one clean
-  miss (1) was a registry key the config simply doesn't watch.
+- **Microsoft Defender** only flagged one technique — the SAM dump (3) — because it matches
+  known malicious *behaviour*. In these tests it **flagged none of the misconfigurations**
+  (1, 2, 4, 5), which are legitimate-looking actions. A company on Defender alone would not
+  have been told these weaknesses exist.
+- **Sysmon (community config)** recorded telemetry for four of the five (⚠️). That is what it
+  is designed to do: it logs, it doesn't alert, so turning the data into a detection needs
+  rules in a SIEM. For technique 1, no matching registry event was found in the sample of
+  events checked (see that page for the limits of that check).
 - **The purpose-built detectors** caught four of five — every misconfiguration the standard
   tools missed. Their one miss (3) was the **polling design**: a millisecond-long command
   slipped between 3-second polls. Sysmon, being event-driven, caught that same command — the
   clearest evidence for the main 2.0 improvement: **move the detectors from polling to
   event-driven.**
 
-**The gap:** misconfigurations that enable privilege escalation go unnoticed by the
-defences a typical organisation relies on. The Sigma rules in [`sigma-rules/`](sigma-rules/)
-close that gap by turning the available telemetry into alerts.
+**The gap:** in these tests, misconfigurations that enable privilege escalation went
+unnoticed by the defences a typical organisation relies on. The Sigma rules in
+[`sigma-rules/`](sigma-rules/) are **proposals** to close that gap by turning the available
+telemetry into alerts. They are experimental and have not yet been validated against sample
+events or run in a SIEM (see [`sigma-rules/README.md`](sigma-rules/README.md)).
 
 ## Repository layout
 

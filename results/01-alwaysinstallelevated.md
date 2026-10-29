@@ -78,16 +78,17 @@ present (`0x1`). Then each defence was checked.
 
 | Defence | Detected? | What it showed |
 |---|---|---|
-| Microsoft Defender | ❌ Miss | `Get-MpThreatDetection` count = 0; Defender does not inspect this policy value |
-| Sysmon + community config | ❌ Miss | No Event 13 for the `AlwaysInstallElevated` key. Sysmon *is* logging registry (≥5 other Event 13s present), so the gap is in the config's key coverage, not in Sysmon being off |
+| Microsoft Defender | ❌ Miss | `Get-MpThreatDetection` count = 0 (no detection recorded) |
+| Sysmon + community config | ❌ Not observed | No Event 13 for the `AlwaysInstallElevated` key was found in the **most recent 20 registry events checked**. Other Event 13s were present, so registry logging was on. This was a sample, not an exhaustive search of the log, and the config's key coverage was not reviewed separately |
 | My own detector (1.0) | ✅ **Detected** | Flagged `CRITICAL: AlwaysInstallElevated exploitable (HKLM=1 & HKCU=1)` within ~2 seconds of polling — caught the exact misconfiguration the other two missed |
 
 **Finding:** a privilege-escalation misconfiguration that gives any installer SYSTEM
-rights can be enabled with **no alert from either standard defence** (Defender doesn't
-look at this policy; the SwiftOnSecurity Sysmon config doesn't watch this key). The
+rights can be enabled with **no alert from either standard defence** (Defender raised
+nothing; in the Sysmon sample checked, no event for this key appeared, most likely because
+the community config doesn't watch it, though that was not confirmed against the config). The
 purpose-built 1.0 detector, however, flagged it **CRITICAL within ~2 seconds**. So the
-gap is real, and a targeted detector closes it — which is exactly what Sigma rule `01a`
-does.
+gap is real, and a targeted detector closed it in this test. Sigma rule `01a` proposes the
+same detection for a SIEM (experimental, not yet validated).
 
 Evidence — the two standard defences miss it:
 

@@ -30,8 +30,10 @@ Every technique follows the same method, so the comparison is fair:
 ## How to read the conclusion
 
 The interesting result is **the gaps** — the ❌ and ⚠️ cells. Each gap is where a real
-company running that defence would miss the attack, and each one is answered by a Sigma
-rule in [`../sigma-rules/`](../sigma-rules/) that would have caught it.
+company running that defence would miss the attack. Each one has a proposed Sigma rule in
+[`../sigma-rules/`](../sigma-rules/) designed to catch it; the rules are experimental and
+not yet validated against sample events. For Sysmon, ⚠️ is the expected result: it records
+events but does not alert on its own.
 
 > All five techniques have been run and the matrix is complete. Each technique's page states
 > precisely what was demonstrated — vulnerable configuration found, activity observed,

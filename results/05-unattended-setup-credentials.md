@@ -83,8 +83,9 @@ would fire. Then the file was read with `findstr Password ...`, which printed th
 **Finding:** the detector caught the read — but note the **dependency**: 4663 only fires
 because we first enabled a SACL on the file. Without that auditing step, the detector would
 be silent, which is the honest caveat recorded in the write-up above. Sysmon logged the
-reading process (telemetry present, no alert); Defender ignored it. Sigma rules `05a`
-(process-based) and `05b` (audit-based) turn these into alerts.
+reading process (telemetry present, no alert); Defender raised nothing. Sigma rules `05a`
+(process-based) and `05b` (audit-based) propose alerts on these (experimental, not yet
+validated).
 
 > Tuning note: the detector flagged `labadmin` as "unauthorized" because its built-in
 > allow-list only covers `administrator/system/admin`. In a real run the read would be done

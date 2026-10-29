@@ -89,8 +89,8 @@ Then each defence was checked.
 **Finding:** only the purpose-built detector *identified the vulnerability*. Defender
 ignored it entirely; Sysmon **captured the activity but didn't flag the risk** — a skilled
 analyst could spot the missing quotes by reading the Event 1 command line, but no alert
-fired. This is the gap between **logging** and **detecting**, and it's exactly what Sigma
-rules `02a`/`02b` close: they turn Sysmon's raw telemetry into an actual alert.
+fired. This is the gap between **logging** and **detecting**. Sigma rules `02a`/`02b`
+propose turning Sysmon's raw telemetry into an alert (experimental, not yet validated).
 
 Evidence — the detector flags the vulnerable service and its hijack paths:
 
