@@ -78,7 +78,7 @@ save was blocked**.
 |---|---|---|
 | Microsoft Defender | ✅ **Detected & blocked** | Flagged the command `reg.exe save hklm\sam ...` (ThreatID 2147840094) and blocked it — the `reg save hklm\sam` returned an error because Defender stopped it. The non-credential SYSTEM hive save was allowed |
 | Sysmon + community config | ⚠️ Partial | Logged both `reg.exe save` commands as Event 1 (process create, event-driven) — so it captured what the detector missed — but raised **no alert** |
-| My own detector (1.0) | ❌ Miss | Polls every 5 seconds; `reg.exe` runs in milliseconds, so the process was gone before the next poll. The documented polling limitation, confirmed in the lab |
+| My own detector (1.0) | ❌ Miss | Polls every 3 seconds; `reg.exe` runs in milliseconds, so the process was gone before the next poll. The documented polling limitation, confirmed in the lab |
 
 **Finding:** this technique flips the pattern. Defender is **strong against known malicious
 behaviour** — it recognised and blocked the SAM dump by its command line — while it was

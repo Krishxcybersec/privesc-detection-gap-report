@@ -83,7 +83,7 @@ The three defences have clearly different blind spots:
   miss (1) was a registry key the config simply doesn't watch.
 - **The purpose-built detectors** caught four of five — every misconfiguration the standard
   tools missed. Their one miss (3) was the **polling design**: a millisecond-long command
-  slipped between 5-second checks. Sysmon, being event-driven, caught that same command — the
+  slipped between 3-second polls. Sysmon, being event-driven, caught that same command — the
   clearest evidence for the main 2.0 improvement: **move the detectors from polling to
   event-driven.**
 
