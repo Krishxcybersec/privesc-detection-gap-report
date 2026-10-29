@@ -31,9 +31,11 @@ Every technique follows the same method, so the comparison is fair:
 
 The interesting result is **the gaps** — the ❌ and ⚠️ cells. Each gap is where a real
 company running that defence would miss the attack. Each one has a proposed Sigma rule in
-[`../sigma-rules/`](../sigma-rules/) designed to catch it; the rules are experimental and
-not yet validated against sample events. For Sysmon, ⚠️ is the expected result: it records
-events but does not alert on its own.
+[`../sigma-rules/`](../sigma-rules/) designed to catch it. The rules are experimental: three
+(`01a`, `03a`, `04a`) are validated with pySigma against positive and benign sample events,
+the other seven only parse and convert, and none has been run in a SIEM yet (see
+[`../sigma-rules/README.md`](../sigma-rules/README.md)). For Sysmon, ⚠️ is the expected result:
+it records events but does not alert on its own.
 
 > All five techniques have been run and the matrix is complete. Each technique's page states
 > precisely what was demonstrated — vulnerable configuration found, activity observed,

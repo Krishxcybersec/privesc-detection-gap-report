@@ -28,14 +28,17 @@ pytest tests
 | Rule | Positives (must match) | Benign cases (must not match) |
 |---|---|---|
 | `01a` AlwaysInstallElevated set | HKLM value set to 1; per-user (HKU) value set to 1 | value set back to 0; a different Installer value; a similarly named value elsewhere |
-| `03a` credential-hive save | the lab's `reg save hklm\sam`; upper-case `REG SAVE HKLM\SYSTEM`; long `HKEY_LOCAL_MACHINE\SECURITY` spelling; quoted path and hive | `reg query HKLM\SAM /v save /s`; saving a non-credential hive; `reg export`; another program mentioning `hklm\sam` |
+| `03a` credential-hive save | the lab's `reg save hklm\sam`; upper-case `REG SAVE HKLM\SYSTEM`; long `HKEY_LOCAL_MACHINE\SECURITY` spelling; quoted path and hive | `reg query HKLM\SAM /v save /s`; saving a non-credential hive; saving a non-credential hive **to a path containing `hklm\sam`**; `HKLM\SAMPLE`; `reg export`; another program mentioning `hklm\sam` |
 | `04a` runas /savecred | the lab's `runas /savecred /user:...`; mixed-case `/SaveCred` | runas without `/savecred`; `runas /?`; another program with `/savecred` in its arguments |
 
 **The validation found and fixed real problems in `03a`.** Run against the same events, the
 original rule **missed** the `HKEY_LOCAL_MACHINE` spelling (its "long-form" entries were
 duplicates of the short ones) and **falsely matched** `reg query HKLM\SAM /v save /s`
-(any `save` word counted). The rule now requires `save` to be the `reg` subcommand and
-lists both hive spellings.
+(any `save` word counted). A later independent review found a third case: `reg save
+HKLM\SOFTWARE C:\backup\hklm\sam.hiv` matched, because the hive name was searched anywhere in
+the line, including the destination path. The rule is now a single pattern: `save` must be
+the `reg` subcommand, the credential hive (either spelling) must be the argument straight
+after it, and the hive name must end there (`HKLM\SAMPLE` is not `HKLM\SAM`).
 
 ### What this validation does NOT show
 

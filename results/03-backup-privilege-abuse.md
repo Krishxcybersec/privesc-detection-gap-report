@@ -63,26 +63,28 @@ hive**. Real backups use shadow copies through the backup service, not a user ru
 ## Results from the lab (Signal B — SAM/SYSTEM hives dumped)
 
 Tested 2026-10-28 on `WIN-LAB`. With the detector running, `reg save hklm\sam` and
-`reg save hklm\system` were run from an admin shell. The SYSTEM save completed; the **SAM
-save returned an error, and Defender reported blocking it**.
+`reg save hklm\system` were run from an admin shell. Defender **detected** the SAM save
+(captured below). During the lab, the SAM save returned an error and Defender showed it as
+blocked, and the SYSTEM save completed. Those three points were **seen but not captured** in the
+published screenshots.
 
 **Scope of this test (precise claims):**
 - ✅ Suspicious activity observed — the `reg save` of credential hives
 - ❌ Privilege-escalation path demonstrated — the `reg save` was run from an **administrative**
   shell to generate the telemetry; this is **not** a non-admin Backup Operators account
   escalating, and no hashes were extracted
-- ✅ Detection validated — **Defender recorded the SAM save and reported blocking it**; Sysmon
-  recorded two matching process events; the polling detector missed them (its documented
-  timing limitation)
+- ✅ Detection validated — **Defender detected the SAM save** (captured; the block was seen in the
+  lab but its action field isn't in the screenshot); Sysmon recorded two matching process
+  events; the polling detector missed them (its documented timing limitation)
 
 | Defence | Detected? | What it showed |
 |---|---|---|
-| Microsoft Defender | ✅ **Detected; reported blocked** | Recorded a detection for `reg.exe save hklm\sam ...` (ThreatID 2147840094) with action *blocked*, and the `reg save hklm\sam` command returned an error at the same moment. Together these indicate the block; the absence of an output file was **not** separately checked. The SYSTEM hive save completed |
+| Microsoft Defender | ✅ **Detected** | Recorded a detection for `reg.exe save hklm\sam ...` (ThreatID 2147840094), shown in the screenshot. The *blocked* action and the command's error were seen during the lab but are **not captured** (the screenshot selects only time, ThreatID and resources). Whether an output file was written was not checked |
 | Sysmon + community config | ⚠️ Telemetry, no alert | Two Event 1 (process-create) records matched a search for `reg.exe` + `save`, at the times the two commands were run. The screenshot shows their timestamps, not their full command lines, so each is matched to its hive by timing and order. No alert, which is expected: Sysmon records events, it doesn't alert on them |
 | My own detector (1.0) | ❌ Miss | Polls every 3 seconds; `reg.exe` runs in milliseconds, so the process was gone before the next poll. The documented polling limitation, confirmed in the lab |
 
 **Finding:** this technique flips the pattern. Defender is **strong against known malicious
-behaviour** — it flagged the SAM dump by its command line and reported blocking it — while it was
+behaviour** — it flagged the SAM dump by its command line (and was seen to block it) — while it was
 blind to the misconfigurations in techniques 1–2. Sysmon's event-driven logging **caught
 what the polling detector missed**, which is the clearest possible evidence for the 2.0
 improvement: move the detectors from polling to event-driven (ETW/WMI). Sigma rule `03a`

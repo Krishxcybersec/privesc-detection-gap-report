@@ -13,10 +13,10 @@ Every statement below is labelled by how well it is supported:
 
 | Label | Meaning |
 |---|---|
-| **Observed** | Seen directly in the captured evidence (screenshot or query output) |
-| **Tool-reported** | Stated by a security tool; the tool's own claim, not independently checked |
+| **Observed** | Shown in the published evidence (a screenshot in this repository) |
+| **Lab observation** | Seen by the analyst during the lab, but **not captured** in the published evidence — the reader has to take it on trust |
 | **Inferred** | A reasonable conclusion from the evidence, but not directly shown |
-| **Not verified** | Needed for a complete answer, but not checked in this evidence |
+| **Not verified** | Needed for a complete answer, but not checked |
 
 ---
 
@@ -29,10 +29,14 @@ Every statement below is labelled by how well it is supported:
 | **ThreatID** | 2147840094 |
 | **Host** | WIN-LAB |
 | **Time (first seen)** | 2026-10-28 22:52:15 |
-| **Action reported by tool** | Blocked |
+| **Action taken by tool** | Blocked — *lab observation; the action field is not in the captured output* |
 
-Defender resource string:
+Defender resource string (captured):
 `CmdLine:_C:\Windows\System32\reg.exe save hklm\sam C:\temp\sam.hiv`
+
+Captured evidence:
+[`../screenshots/03-backup-defender-blocks.png`](../screenshots/03-backup-defender-blocks.png)
+(`Get-MpThreatDetection` showing `InitialDetectionTime`, `ThreatID` and `Resources` only).
 
 ## 2. Triage — what is this?
 
@@ -46,11 +50,15 @@ high-priority and worth a full look rather than a quick dismissal.
 
 | # | Source | What it shows | Label |
 |---|---|---|---|
-| E1 | Defender detection record | ThreatID 2147840094 for the command `reg.exe save hklm\sam C:\temp\sam.hiv` at 22:52:15 | **Observed** |
-| E2 | Defender detection record | Action = *blocked* | **Tool-reported** |
-| E3 | Analyst's shell | `reg save hklm\sam ...` returned an error; `reg save hklm\system ...` completed | **Observed** |
-| E4 | Sysmon Event ID 1 (process create) | Two records matching a search for `reg.exe` + `save`, at 22:52:16 and 22:52:19. The screenshot shows their timestamps, not their full command lines | **Observed** (timestamps only) |
-| E5 | Test set-up | Commands were run as `WIN-LAB\labadmin` (local administrator) | Known from the test context |
+| E1 | Defender detection record | ThreatID 2147840094 for the command `reg.exe save hklm\sam C:\temp\sam.hiv`, first detected 22:52:15 | **Observed** ([screenshot](../screenshots/03-backup-defender-blocks.png)) |
+| E2 | Defender | The detection's action was *blocked*. The captured output selects only time, ThreatID and resources, so the action/status field is **not shown** | **Lab observation** |
+| E3 | Analyst's shell | `reg save hklm\sam ...` returned an error; `reg save hklm\system ...` completed. Neither command's output is in the published screenshots | **Lab observation** |
+| E4 | Sysmon Event ID 1 (process create) | Two records, at 22:52:16 and 22:52:19, matching `reg.exe` + `save` among the last 300 Event 1 records. Timestamps only; full command lines not shown | **Observed** ([screenshot](../screenshots/03-backup-sysmon-logged.webp)) |
+| E5 | Test set-up | Commands were run as `WIN-LAB\labadmin` (local administrator) | **Lab observation** (the shell prompt in the screenshots shows `C:\Users\labadmin`) |
+
+To raise E2 and E3 to **Observed**, the evidence would need
+`Get-MpThreatDetection | Select-Object ActionSuccess, ThreatStatusID, ...` (or the Defender
+event 1116/1117 in the event log) and the output of the two `reg save` commands.
 
 Key query used (Sysmon):
 ```powershell
@@ -61,7 +69,7 @@ Get-WinEvent -FilterHashtable @{LogName='Microsoft-Windows-Sysmon/Operational';I
 ## 4. Timeline
 
 ```
-22:52:15  Defender records the SAM-save command, action "blocked"      (E1, E2)
+22:52:15  Defender records the SAM-save command (E1); action "blocked" (E2, lab observation)
 22:52:16  Sysmon Event 1: reg.exe + save  -> attributed to the SAM save (E4, by order)
 22:52:19  Sysmon Event 1: reg.exe + save  -> attributed to the SYSTEM save (E4, by order)
 ```
@@ -73,10 +81,13 @@ so their exact order within a second is not meaningful.
 
 ## 5. What is and isn't established
 
-**Established**
-- A `reg.exe save` of the SAM hive was attempted and Defender recorded it (E1). *(Observed)*
-- The SAM save returned an error at the time Defender reported blocking it (E2, E3).
-- A save of the SYSTEM hive completed (E3). *(Observed)*
+**Established from the published evidence**
+- A `reg.exe save` of the SAM hive was attempted and Defender detected it (E1). *(Observed)*
+- Two `reg.exe` + `save` process starts were recorded by Sysmon seconds later (E4). *(Observed)*
+
+**Seen in the lab, not captured**
+- Defender's action on the detection was *blocked* (E2).
+- The SAM save returned an error, and the SYSTEM save completed (E3).
 
 **Inferred, not shown**
 - That Defender's block **caused** the SAM save to fail. The error and the detection happened
@@ -96,10 +107,10 @@ so their exact order within a second is not meaningful.
 **True positive: a credential-dumping attempt.** The command, the target (SAM), and the
 paired SYSTEM-hive save make the behaviour unambiguous.
 
-- Confidence in the **behaviour**: high (observed).
+- Confidence in the **behaviour**: high (the detection record is captured).
 - Confidence in the **impact** (that no credential material was exposed): medium. The SAM step
-  was reported blocked, but the on-disk checks above are still open, and the SYSTEM hive copy
-  is known to exist.
+  was seen to be blocked during the lab, but that isn't in the captured evidence, the on-disk
+  checks above are still open, and a SYSTEM hive copy is believed to exist.
 
 ## 7. Response
 
@@ -116,10 +127,12 @@ paired SYSTEM-hive save make the behaviour unambiguous.
 
 > **Title:** Credential-dumping attempt on WIN-LAB (SAM hive save)
 > **Severity:** High · **Status:** Open, pending verification · **Account:** WIN-LAB\labadmin
-> **Summary:** At 2026-10-28 22:52, Defender recorded `reg.exe` saving the SAM hive (T1003.002)
-> and reported blocking it; the command returned an error. A SYSTEM-hive save completed
-> seconds later. Verdict: true-positive credential-dumping attempt.
-> **Known:** SAM save attempted and reported blocked; SYSTEM hive copy created.
+> **Summary:** At 2026-10-28 22:52, Defender detected `reg.exe` saving the SAM hive (T1003.002).
+> During the lab the action was seen as blocked and the command returned an error, and a
+> SYSTEM-hive save completed seconds later (not captured in the evidence). Verdict:
+> true-positive credential-dumping attempt.
+> **Evidenced:** SAM save attempted and detected; two matching Sysmon process events.
+> **Lab observation only:** block action; SAM save error; SYSTEM hive copy created.
 > **Not yet verified:** absence of a SAM copy on disk; location/removal of the SYSTEM copy;
 > no exfiltration; whether the activity was authorised.
 > **Next:** complete response actions 1–4. Close only once they are done and recorded;

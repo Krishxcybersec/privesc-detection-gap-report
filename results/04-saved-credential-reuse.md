@@ -45,7 +45,8 @@ reusable** by a lower-privileged user.
   for the admin account.
 
 Watching 4648 **correlated** with a `runas /savecred` process is what separates abuse from
-noise — the same approach my 1.0 detector takes.
+noise. My 1.0 detector moves in this direction, but only partly. See the correlation note under
+the lab results.
 
 ## Detection logic (plain English)
 
@@ -70,18 +71,26 @@ spawning a shell as labadmin).
 - ⚠️ Privilege-escalation path demonstrated — `runas /savecred` ran a command as `labadmin`,
   but this was **not** a clean standard-user → administrator transition using a credential a
   standard user should not have had; it shows the technique's footprint, not a full escalation
-- ✅ Detection validated — the 1.0 detector caught the full correlated chain (cmdkey, runas, logon, privileges, child shell)
+- ✅ Detection validated — the 1.0 detector raised an alert for each step (cmdkey, runas, logon,
+  privileges, child shell); only the logon alert was linked to the runas, and only by timing (see note)
 
 | Defence | Detected? | What it showed |
 |---|---|---|
 | Microsoft Defender | ❌ Miss | `Get-MpThreatDetection` listed only the earlier SAM dump (22:52, technique 3); nothing for cmdkey/runas (23:09–23:10). Defender treats these built-in admin tools as legitimate |
 | Sysmon + community config | ⚠️ Partial | Logged the `runas.exe` and `cmdkey.exe` processes (four Event 1s) but raised **no alert** |
-| My own detector (1.0) | ✅ **Detected** | Caught the full chain and **correlated** it: `CMDKEY_Usage`, `RUNAS_SaveCred` (both attempts), `Post-Runas_Logon_4624`, `SpecialPrivs_4672`, and the `RUNAS_ChildShell`. It reads the persisted Security log, where records stay after the process exits, so short-lived activity isn't missed between checks |
+| My own detector (1.0) | ✅ **Detected** | Raised an alert for each step: `CMDKEY_Usage`, `RUNAS_SaveCred` (both attempts), `Post-Runas_Logon_4624`, `SpecialPrivs_4672`, and `RUNAS_ChildShell`. These are separate alerts; only `Post-Runas_Logon_4624` is linked to the runas, by timing. It reads the persisted Security log, where records stay after the process exits, so short-lived activity isn't missed between checks |
 
-**Finding:** the detector's strongest result — it didn't just match one event, it **joined
-related events into a story** (the saved-cred reuse, the resulting logon, the elevated
-privileges, the spawned shell). It caught everything because it reads the **persisted event log** rather than the live process list,
-the direct contrast to technique 3's polling miss. Defender saw nothing (legit tools), and
+**Finding:** the detector's strongest result. It alerted on **every step** of the technique: the
+saved-credential reuse, the resulting logon, the elevated privileges and the spawned shell. It
+caught everything because it reads the **persisted event log** rather than the live process list,
+the direct contrast to technique 3's polling miss.
+
+> **Correlation note (precise claim):** at the time of this test the alerts were *not* joined into
+> one linked incident. The only link was `Post-Runas_Logon_4624`, which fired for an interactive
+> logon within 180 seconds of *any* runas, so it could also fire for an unrelated user. After an
+> external code review this was tightened: the logon must now be for the same account and domain
+> the runas targeted, timed on the events' own timestamps. That is stronger, but still not a hard
+> link (it doesn't match a logon ID or SID), and the fixed version has not been re-run in the lab. Defender saw nothing (legit tools), and
 Sysmon had the telemetry but, as a logging tool, raised no alert. Sigma rules `04a`/`04b`
 propose alerts on that telemetry (experimental; `04a` is validated against sample events,
 `04b` is not yet, and neither has been run in a SIEM).
@@ -90,7 +99,7 @@ propose alerts on that telemetry (experimental; `04a` is validated against sampl
 > technique-4 hit — but checking the detail showed it was the leftover SAM-dump detection from
 > technique 3. Always confirm what a count actually is before reporting it.
 
-Evidence — the detector catches the full correlated chain:
+Evidence — the detector alerts on each step of the chain:
 
 ![Detector alerts on the full saved-credential chain](../screenshots/04-savedcred-detector-catches.webp)
 
