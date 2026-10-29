@@ -76,11 +76,11 @@ spawning a shell as labadmin).
 |---|---|---|
 | Microsoft Defender | ❌ Miss | `Get-MpThreatDetection` listed only the earlier SAM dump (22:52, technique 3); nothing for cmdkey/runas (23:09–23:10). Defender treats these built-in admin tools as legitimate |
 | Sysmon + community config | ⚠️ Partial | Logged the `runas.exe` and `cmdkey.exe` processes (four Event 1s) but raised **no alert** |
-| My own detector (1.0) | ✅ **Detected** | Caught the full chain and **correlated** it: `CMDKEY_Usage`, `RUNAS_SaveCred` (both attempts), `Post-Runas_Logon_4624`, `SpecialPrivs_4672`, and the `RUNAS_ChildShell`. Event-driven (reads the Security log), so no polling gap |
+| My own detector (1.0) | ✅ **Detected** | Caught the full chain and **correlated** it: `CMDKEY_Usage`, `RUNAS_SaveCred` (both attempts), `Post-Runas_Logon_4624`, `SpecialPrivs_4672`, and the `RUNAS_ChildShell`. It reads the persisted Security log, where records stay after the process exits, so short-lived activity isn't missed between checks |
 
 **Finding:** the detector's strongest result — it didn't just match one event, it **joined
 related events into a story** (the saved-cred reuse, the resulting logon, the elevated
-privileges, the spawned shell). It caught everything precisely because it is **event-driven**,
+privileges, the spawned shell). It caught everything because it reads the **persisted event log** rather than the live process list,
 the direct contrast to technique 3's polling miss. Defender saw nothing (legit tools), and
 Sysmon had the telemetry but raised no alert — a gap Sigma rules `04a`/`04b` close.
 
