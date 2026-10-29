@@ -94,6 +94,7 @@ close that gap by turning the available telemetry into alerts.
 ## Repository layout
 
 - [`results/`](results/) — per-technique detection write-ups and the coverage matrix
+- [`soc-investigation/`](soc-investigation/) — a worked end-to-end SOC alert investigation (triage → timeline → verdict → incident ticket)
 - [`sigma-rules/`](sigma-rules/) — the detection rules, in Sigma format, with MITRE tags
 - [`TESTING-PLAN.md`](TESTING-PLAN.md) — how each technique is tested and recorded
 - [`EVENT-IDS.md`](EVENT-IDS.md) — cheat sheet of the Windows event IDs these detections use
