@@ -87,7 +87,7 @@ blind to the misconfigurations in techniques 1–2. Sysmon's event-driven loggin
 what the polling detector missed**, which is the clearest possible evidence for the 2.0
 improvement: move the detectors from polling to event-driven (ETW/WMI). Sigma rule `03a`
 takes the same approach, matching the `reg save` command line in the process-creation event
-(experimental, not yet validated).
+(experimental; validated against sample events, not yet run in a SIEM).
 
 Evidence — the polling detector missed it (only "Monitoring...", no alert):
 

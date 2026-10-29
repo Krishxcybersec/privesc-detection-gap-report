@@ -96,8 +96,9 @@ The three defences have clearly different blind spots:
 **The gap:** in these tests, misconfigurations that enable privilege escalation went
 unnoticed by the defences a typical organisation relies on. The Sigma rules in
 [`sigma-rules/`](sigma-rules/) are **proposals** to close that gap by turning the available
-telemetry into alerts. They are experimental and have not yet been validated against sample
-events or run in a SIEM (see [`sigma-rules/README.md`](sigma-rules/README.md)).
+telemetry into alerts. They are experimental: three (`01a`, `03a`, `04a`) have been
+validated with pySigma against positive and benign sample events, the rest only parse and
+convert, and none has yet been run in a SIEM (see [`sigma-rules/README.md`](sigma-rules/README.md)).
 
 ## Repository layout
 

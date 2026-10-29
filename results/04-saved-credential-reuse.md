@@ -83,7 +83,8 @@ related events into a story** (the saved-cred reuse, the resulting logon, the el
 privileges, the spawned shell). It caught everything because it reads the **persisted event log** rather than the live process list,
 the direct contrast to technique 3's polling miss. Defender saw nothing (legit tools), and
 Sysmon had the telemetry but, as a logging tool, raised no alert. Sigma rules `04a`/`04b`
-propose alerts on that telemetry (experimental, not yet validated).
+propose alerts on that telemetry (experimental; `04a` is validated against sample events,
+`04b` is not yet, and neither has been run in a SIEM).
 
 > A verification note worth keeping: Defender's threat count showed `1`, which looked like a
 > technique-4 hit — but checking the detail showed it was the leftover SAM-dump detection from

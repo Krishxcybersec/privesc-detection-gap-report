@@ -17,6 +17,11 @@ desktop.ini
 # No raw event-log exports (may contain host details)
 *.evtx
 
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
 # Keep documents out
 *.docx
 *.doc

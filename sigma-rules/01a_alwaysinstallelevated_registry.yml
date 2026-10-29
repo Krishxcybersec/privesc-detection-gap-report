@@ -6,6 +6,10 @@ description: >
     When enabled in both HKLM and HKCU, any MSI package installs with SYSTEM
     privileges, which lets a standard user escalate. On a correctly configured host
     these values are absent or 0, so this is a high-confidence, low-noise signal.
+    It fires on each value being SET to 1 (one event per hive). A single event cannot
+    show that BOTH hives are enabled, which is what makes the host exploitable; confirm
+    by reading both values, or correlate the HKLM and HKU events for the same host.
+    It also depends on the Sysmon configuration actually logging this registry key.
 references:
     - https://attack.mitre.org/techniques/T1548/002/
     - https://learn.microsoft.com/en-us/windows/win32/msi/alwaysinstallelevated

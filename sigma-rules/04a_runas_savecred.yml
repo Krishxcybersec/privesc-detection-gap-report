@@ -5,7 +5,10 @@ description: >
     Detects runas.exe launched with the /savecred option, which runs a program using a
     credential previously stored in Windows Credential Manager without prompting for the
     password. A standard user using /savecred to run as a privileged account is a common
-    privilege-escalation path.
+    privilege-escalation path. This rule detects the ATTEMPT (the process starting with
+    that option); on its own it does not confirm that a stored credential existed or that
+    the program ran as the other account. Pair it with a 4648/4624 logon for the target
+    account to confirm.
 references:
     - https://attack.mitre.org/techniques/T1078/
     - https://attack.mitre.org/techniques/T1555/004/

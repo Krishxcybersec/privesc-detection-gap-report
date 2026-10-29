@@ -88,7 +88,8 @@ nothing; in the Sysmon sample checked, no event for this key appeared, most like
 the community config doesn't watch it, though that was not confirmed against the config). The
 purpose-built 1.0 detector, however, flagged it **CRITICAL within ~2 seconds**. So the
 gap is real, and a targeted detector closed it in this test. Sigma rule `01a` proposes the
-same detection for a SIEM (experimental, not yet validated).
+same detection for a SIEM (experimental; validated against sample events, not yet run in a
+SIEM).
 
 Evidence — the two standard defences miss it:
 

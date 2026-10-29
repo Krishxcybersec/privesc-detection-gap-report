@@ -20,17 +20,21 @@ detection:
     selection_img:
         Image|endswith: '\reg.exe'
     selection_save:
-        CommandLine|contains: ' save '
+        # `save` must be the reg SUBCOMMAND (the word straight after reg / reg.exe),
+        # not just the word "save" somewhere in the line, e.g. `reg query ... /v save /s`.
+        CommandLine|re: '(?i)\breg(\.exe)?"?\s+save\s'
     selection_hive:
         CommandLine|contains:
             - 'hklm\sam'
             - 'hklm\system'
             - 'hklm\security'
-            - 'hklm\\sam'
-            - 'hklm\\system'
-            - 'hklm\\security'
+            - 'hkey_local_machine\sam'
+            - 'hkey_local_machine\system'
+            - 'hkey_local_machine\security'
     condition: all of selection_*
 falsepositives:
     - Administrators deliberately backing up a hive during maintenance. Should be rare
       and attributable to a known admin and change window.
+    - Saving a SUBKEY of the SYSTEM hive (e.g. hklm\system\CurrentControlSet\...) also
+      matches, because the hive names are matched as substrings.
 level: critical
