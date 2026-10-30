@@ -61,8 +61,9 @@ after it, and the hive name must end there (`HKLM\SAMPLE` is not `HKLM\SAM`).
   deeper candidate locations and is not correlated to a specific vulnerable service.
 - **`02b` (service execution):** excludes `Program Files`, which also suppresses some plausible
   hijack paths inside it.
-- **`03a` (credential-hive save):** saving a subkey of the SYSTEM hive also matches, because hive
-  names are matched as substrings.
+- **`03a` (credential-hive save):** saving a subkey of a credential hive (for example
+  `hklm\system\CurrentControlSet`) also matches, because the pattern allows a `\` after the hive
+  name. This is deliberate: a subkey is less sensitive than the whole hive, but still worth a look.
 - **`03b` (backup tools):** a `/b` backup-mode flag on its own can satisfy the selection; it does
   not require a reference to a credential file.
 - **`04a` / `04b` (runas / cmdkey):** detect the attempt or the credential being stored, not that

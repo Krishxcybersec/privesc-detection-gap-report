@@ -90,8 +90,9 @@ the direct contrast to technique 3's polling miss.
 > logon within 180 seconds of *any* runas, so it could also fire for an unrelated user. After an
 > external code review this was tightened: the logon must now be for the same account and domain
 > the runas targeted, timed on the events' own timestamps. That is stronger, but still not a hard
-> link (it doesn't match a logon ID or SID), and the fixed version has not been re-run in the lab. Defender saw nothing (legit tools), and
-Sysmon had the telemetry but, as a logging tool, raised no alert. Sigma rules `04a`/`04b`
+> link (it doesn't match a logon ID or SID), and the fixed version has not been re-run in the lab.
+
+Defender saw nothing (legit tools), and Sysmon had the telemetry but, as a logging tool, raised no alert. Sigma rules `04a`/`04b`
 propose alerts on that telemetry (experimental; `04a` is validated against sample events,
 `04b` is not yet, and neither has been run in a SIEM).
 
